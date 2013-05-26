@@ -32,25 +32,52 @@ void detect_features_cpu(cv::Mat &src_img, vector<cv::KeyPoint> &keypoints, cv::
 void detect_features_gpu(cv::Mat &src_img, vector<cv::KeyPoint> &keypoints, cv::Mat &descriptors);
 
 // aspect variables get globals for this toy
-double cpu_feat = 0, cpu_desc = 0;
+double cpu_feat = 0, cpu_desc = 0, gpu_feat = 0, gpu_desc = 0;
 
 int main(int argc, const char *argv[]) {
    if (argc != 2) { readme(argv[0]); return 0; }
 
    list<string> images = get_files_recursive(argv[1], ".jpg");
    
-   // Detect features for each image
+   vector<cv::KeyPoint> keypoints;
+   cv::Mat descriptors;
+
+   // Detect features for each image on the CPU
    for (list<string>::iterator image = images.begin(); image != images.end(); image++) {
-      std::cout << *image << std::endl;
       cv::Mat grayscale_image = cv::imread( *image, CV_LOAD_IMAGE_GRAYSCALE );
-
-      vector<cv::KeyPoint> keypoints;
-      cv::Mat descriptors;
       detect_features_cpu(grayscale_image, keypoints, descriptors);
-
-      std::cout << cpu_feat << " " << cpu_desc << std::endl;
    }
 
+   // Output the results
+   printf("+=====================================================+\n");
+   printf("| CPU                                                 |\n");
+   printf("+=====================================================+\n");
+   printf("| Total Feature Detection Time:         %10.2f s  |\n", cpu_feat);
+   printf("| Average Feature Detection Time:       %10.2f ms |\n", 1000 * cpu_feat / images.size());
+   printf("| Total Descriptor Extraction Time:     %10.2f s  |\n", cpu_desc);
+   printf("| Average Descriptor Extraction Time:   %10.2f ms |\n", 1000 * cpu_desc / images.size());
+   printf("+=====================================================+\n");
+
+   // Detect features for each image on the GPU
+   for (list<string>::iterator image = images.begin(); image != images.end(); image++) {
+      cv::Mat grayscale_image = cv::imread( *image, CV_LOAD_IMAGE_GRAYSCALE );
+      detect_features_gpu(grayscale_image, keypoints, descriptors);
+   }
+
+   // Output the results
+   printf("| GPU                                                 |\n");
+   printf("+=====================================================+\n");
+   printf("| Total Feature Detection Time:         %10.2f s  |\n", gpu_feat);
+   printf("| Average Feature Detection Time:       %10.2f ms |\n", 1000 * gpu_feat / images.size());
+   printf("| Total Descriptor Extraction Time:     %10.2f s  |\n", gpu_desc);
+   printf("| Average Descriptor Extraction Time:   %10.2f ms |\n", 1000 * gpu_desc / images.size());
+   printf("+=====================================================+\n");
+   printf("| Comparison                                          |\n");
+   printf("+=====================================================+\n");
+   printf("| GPU Feature Detection Speedup:        %10.2f x  |\n", cpu_feat / gpu_feat);
+   printf("| GPU Descriptor Extraction Speedup:    %10.2f x  |\n", cpu_desc / gpu_desc);
+   printf("| GPU Combined Speedup:                 %10.2f x  |\n", (cpu_feat + cpu_desc) / (gpu_feat + gpu_desc));
+   printf("+=====================================================+\n");
 }
 
 // detect features on the CPU
@@ -61,6 +88,29 @@ void detect_features_cpu(cv::Mat &src_img, vector<cv::KeyPoint> &keypoints, cv::
    time(&detector, cpu_feat)->detect(src_img, keypoints);
    time(&extractor, cpu_desc)->compute(src_img, keypoints, descriptors);
 } 
+
+// detect features on the GPU
+void detect_features_gpu(cv::Mat &img, vector<cv::KeyPoint> &keypoints, cv::Mat &descriptors) {
+   static cv::gpu::SURF_GPU surf;
+   
+   cv::gpu::GpuMat img_gpu, keypoints_gpu, descriptors_gpu;
+   
+   // Send image to GPU
+   img_gpu.upload(img);
+ 
+   // Detect features
+   time(&surf,gpu_feat)->operator()(img_gpu, cv::gpu::GpuMat(), keypoints_gpu);
+
+   // Compute descriptors
+   time(&surf,gpu_desc)->operator()(img_gpu, cv::gpu::GpuMat(), keypoints_gpu, descriptors_gpu, true);
+ 
+   // Donload features and keypoints from GPU
+   surf.downloadKeypoints(keypoints_gpu, keypoints);
+   vector<float> descriptors_vector;
+   surf.downloadDescriptors(descriptors_gpu, descriptors_vector);
+   descriptors = cv::Mat(descriptors_vector);
+}
+
 
 // Display usage information
 void readme(const string &program) {

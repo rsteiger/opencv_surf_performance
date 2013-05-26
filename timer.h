@@ -9,8 +9,6 @@
  * as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
  */
 
-
-
 #include <boost/chrono/chrono.hpp>
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/shared_ptr.hpp>
@@ -55,3 +53,5 @@ template <typename T>
 timer<T> time(T* p, double &d) {
   return timer<T>(p,d);
 }
+
+

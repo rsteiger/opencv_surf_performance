@@ -7,5 +7,7 @@ find_package( Boost COMPONENTS system filesystem chrono REQUIRED )
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${OpenCV_INCLUDE_DIR})
 
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
 add_executable( surftest main.cpp )
 target_link_libraries( surftest ${OpenCV_LIBS} ${Boost_LIBRARIES} )
