@@ -9,10 +9,19 @@
  * as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
  */
 
+#pragma once
+
 #include <boost/chrono/chrono.hpp>
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/shared_ptr.hpp>
 
+
+/**
+ * This class times a function call. It creates a temporary shared pointer to
+ * the object on which the function is called. When the shared pointer is
+ * created, the timer starts. When the shared pointer is deleted, the timer
+ * stops.
+ */
 template <typename T>
 class timer {
    protected:

@@ -21,34 +21,35 @@ in each of the image using CPU and GPU implementations of SURF.
     $> surftest path/to/images
 
 ### Results
-Tests run on set of 80 images on 2010 11" MacBook Air
+Tests run on Kodak Lossless True Color Image Suite http://r0k.us/graphics/kodak/
 
-1.4 GHz Intel Core 2 Duo
-
-2 GB 1067 MHz DDR3
-
-NVIDIA GeForce 320M 256 MB
-
-OS X 10.8.3
+2010 11" MacBook Air: 1.4 GHz Intel Core 2 Duo, 2 GB 1067 MHz DDR3, NVIDIA
+GeForce 320M 256 MB, OS X 10.8.3
 
       +=====================================================+
       | CPU                                                 |
       +=====================================================+
-      | Total Feature Detection Time:              18.95 s  |
-      | Average Feature Detection Time:           236.92 ms |
-      | Total Descriptor Extraction Time:          30.41 s  |
-      | Average Descriptor Extraction Time:       380.18 ms |
+      | Total Feature Detection Time:              13.81 s  |
+      | Average Feature Detection Time:           575.26 ms |
+      | Total Descriptor Extraction Time:          23.05 s  |
+      | Average Descriptor Extraction Time:       960.42 ms |
+      | Total Calculation Time:                    36.86 s  |
+      | Average Calculation Time:                1535.69 ms |
       +=====================================================+
       | GPU                                                 |
       +=====================================================+
-      | Total Feature Detection Time:               2.78 s  |
-      | Average Feature Detection Time:            34.70 ms |
-      | Total Descriptor Extraction Time:           1.34 s  |
-      | Average Descriptor Extraction Time:        16.74 ms |
+      | Total Feature Detection Time:               2.12 s  |
+      | Average Feature Detection Time:            88.38 ms |
+      | Total Descriptor Extraction Time:           1.09 s  |
+      | Average Descriptor Extraction Time:        45.23 ms |
+      | Total Calculation Time (including bus):    19.03 s  |
+      | Average Calculation Time:                 792.97 ms |
       +=====================================================+
       | Comparison                                          |
       +=====================================================+
-      | GPU Feature Detection Speedup:              6.83 x  |
-      | GPU Descriptor Extraction Speedup:         22.71 x  |
-      | GPU Combined Speedup:                      12.00 x  |
+      | GPU Feature Detection Speedup:              6.51 x  |
+      | GPU Descriptor Extraction Speedup:         21.24 x  |
+      | GPU Combined Speedup:                      11.49 x  |
+      | GPU Overall Speedup:                        1.94 x  |
       +=====================================================+
+
